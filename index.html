@@ -1,455 +1,540 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, DollarSign, AlertTriangle, BookOpen, Trophy, PiggyBank } from 'lucide-react';
-
-const MoneyWellGame = () => {
-  const [gameState, setGameState] = useState({
-    age: 22,
-    portfolio: 10000,
-    riskLevel: 'moderate',
-    currentStage: 'early-career',
-    year: 2024,
-    totalContributions: 10000,
-    lifeEvents: [],
-    gameComplete: false,
-    showSummary: false
-  });
-
-  const [currentDecision, setCurrentDecision] = useState(null);
-  const [yearlyGrowth, setYearlyGrowth] = useState(0);
-
-  const lifeStages = {
-    'early-career': { name: 'Early Career', ages: [22, 35], color: 'bg-green-500' },
-    'mid-career': { name: 'Mid Career', ages: [36, 50], color: 'bg-blue-500' },
-    'peak-earning': { name: 'Peak Earning', ages: [51, 60], color: 'bg-purple-500' },
-    'pre-retirement': { name: 'Pre-Retirement', ages: [61, 65], color: 'bg-orange-500' },
-    'retirement': { name: 'Retirement', ages: [66, 85], color: 'bg-red-500' }
-  };
-
-  const riskProfiles = {
-    conservative: { 
-      name: 'Conservative', 
-      avgReturn: 0.05, 
-      volatility: 0.08, 
-      color: 'text-green-600',
-      description: 'Lower risk, steady growth'
-    },
-    moderate: { 
-      name: 'Moderate', 
-      avgReturn: 0.08, 
-      volatility: 0.15, 
-      color: 'text-blue-600',
-      description: 'Balanced risk and reward'
-    },
-    aggressive: { 
-      name: 'Aggressive', 
-      avgReturn: 0.12, 
-      volatility: 0.25, 
-      color: 'text-red-600',
-      description: 'Higher risk, higher potential'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Money Well - Lifetime Investment Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
-  };
-
-  const lifeEvents = [
-    {
-      age: 28, type: 'marriage', title: 'Getting Married',
-      description: 'Wedding costs $25,000. How do you handle this?',
-      options: [
-        { text: 'Withdraw from investments', impact: -25000, lesson: 'Early withdrawal reduces compound growth' },
-        { text: 'Take a loan, keep investing', impact: -5000, lesson: 'Debt has cost, but investments keep growing' },
-        { text: 'Simple ceremony, minimal impact', impact: -5000, lesson: 'Living within means preserves wealth' }
-      ]
-    },
-    {
-      age: 32, type: 'house', title: 'Buying First Home',
-      description: 'Need $50,000 down payment. What\'s your strategy?',
-      options: [
-        { text: 'Liquidate 50% of portfolio', impact: -0.5, isPercentage: true, lesson: 'Large withdrawals hurt long-term growth' },
-        { text: 'Withdraw only what\'s needed', impact: -50000, lesson: 'Targeted withdrawals minimize damage' },
-        { text: 'Get a loan, keep investments', impact: -10000, lesson: 'Leverage can preserve investment growth' }
-      ]
-    },
-    {
-      age: 38, type: 'children', title: 'Starting a Family',
-      description: 'Children mean new expenses. How do you adjust?',
-      options: [
-        { text: 'Reduce contributions by 50%', impact: 'reduce_contrib_50', lesson: 'Reduced contributions slow wealth building' },
-        { text: 'Switch to conservative investing', impact: 'conservative_switch', lesson: 'Being too conservative can hurt long-term growth' },
-        { text: 'Maintain plan, budget elsewhere', impact: 0, lesson: 'Staying disciplined maximizes compound growth' }
-      ]
-    },
-    {
-      age: 45, type: 'career', title: 'Job Loss & Career Change',
-      description: 'Unemployment for 8 months. How do you survive?',
-      options: [
-        { text: 'Raid retirement savings', impact: -40000, lesson: 'Emergency fund would have prevented this loss' },
-        { text: 'Live on emergency fund', impact: -15000, lesson: 'Emergency funds protect investments' },
-        { text: 'Take any job quickly', impact: -5000, lesson: 'Quick action minimizes financial damage' }
-      ]
-    },
-    {
-      age: 55, type: 'parents', title: 'Aging Parents',
-      description: 'Parents need financial support. What do you do?',
-      options: [
-        { text: 'Withdraw from retirement fund', impact: -60000, lesson: 'This impacts your own retirement security' },
-        { text: 'Adjust current budget', impact: -20000, lesson: 'Current sacrifices protect future wealth' },
-        { text: 'Seek family cost-sharing', impact: -10000, lesson: 'Shared responsibility reduces individual burden' }
-      ]
+    body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-  ];
-
-  const calculateGrowth = (currentAmount, riskLevel, age) => {
-    const profile = riskProfiles[riskLevel];
-    const randomFactor = (Math.random() - 0.5) * profile.volatility * 2;
-    const marketReturn = profile.avgReturn + randomFactor;
-    
-    // Age-based contribution (higher in peak earning years)
-    let annualContribution = 6000;
-    if (age >= 36 && age <= 50) annualContribution = 12000;
-    if (age >= 51 && age <= 60) annualContribution = 15000;
-    if (age >= 61) annualContribution = 0; // No more contributions in retirement
-    
-    const growth = currentAmount * marketReturn;
-    const newTotal = currentAmount + growth + annualContribution;
-    
-    return {
-      growth: growth,
-      contribution: annualContribution,
-      newTotal: newTotal,
-      return: marketReturn
-    };
-  };
-
-  const advanceYear = () => {
-    if (gameState.gameComplete) return;
-    
-    const newAge = gameState.age + 1;
-    const growth = calculateGrowth(gameState.portfolio, gameState.riskLevel, newAge);
-    
-    // Check for life events
-    const lifeEvent = lifeEvents.find(event => event.age === newAge);
-    if (lifeEvent) {
-      setCurrentDecision(lifeEvent);
-      return;
+    .game-container {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(102,126,234,0.15);
+      max-width: 560px;
+      width: 100%;
+      padding: 34px 24px 20px 24px;
+      margin: 32px 0;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
     }
-    
-    // Update stage if needed
-    let newStage = gameState.currentStage;
-    Object.entries(lifeStages).forEach(([key, stage]) => {
-      if (newAge >= stage.ages[0] && newAge <= stage.ages[1]) {
-        newStage = key;
+    .header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .header .logo {
+      font-size: 2.2em;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 0;
+    }
+    .header .subtitle {
+      color: #764ba2;
+      font-size: 1.2em;
+      margin-top: 4px;
+      margin-bottom: 0;
+      font-weight: 500;
+    }
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 18px 0 12px 0;
+      gap: 8px;
+    }
+    .stat-box {
+      flex: 1;
+      background: #f0f4ff;
+      border-radius: 10px;
+      text-align: center;
+      padding: 10px 0 6px 0;
+      margin: 0 2px;
+    }
+    .stat-label {
+      color: #667eea;
+      font-size: 0.9em;
+      margin-bottom: 2px;
+    }
+    .stat-value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #222;
+    }
+    .stage-bar {
+      background: #e1e8ff;
+      border-radius: 8px;
+      height: 12px;
+      margin: 10px 0 18px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .stage-fill {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      height: 100%;
+      border-radius: 8px;
+      transition: width 0.4s;
+    }
+    .risk-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .risk-btns {
+      display: flex;
+      gap: 7px;
+    }
+    .risk-btn {
+      border: none;
+      border-radius: 16px;
+      font-size: 0.95em;
+      padding: 5px 14px;
+      cursor: pointer;
+      background: #f0f4ff;
+      color: #667eea;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+    .risk-btn.selected, .risk-btn:hover {
+      background: #667eea;
+      color: #fff;
+    }
+    .desc {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .advance-btn {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      padding: 14px 0;
+      font-size: 1.15em;
+      font-weight: 600;
+      margin-top: 14px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .advance-btn:disabled {
+      background: #ccd3f7;
+      color: #888;
+      cursor: not-allowed;
+    }
+    .life-event {
+      background: #f8f9ff;
+      border-left: 5px solid #667eea;
+      border-radius: 12px;
+      padding: 18px 14px;
+      margin: 18px 0;
+    }
+    .life-event-title {
+      color: #667eea;
+      font-size: 1.15em;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+    .life-event-desc {
+      color: #444;
+      margin-bottom: 12px;
+    }
+    .event-choice {
+      display: block;
+      width: 100%;
+      background: #fff;
+      border: 2px solid #e1e8ff;
+      border-radius: 8px;
+      color: #333;
+      font-size: 1em;
+      padding: 11px 10px;
+      margin-bottom: 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: border 0.2s, background 0.2s;
+    }
+    .event-choice:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+    .event-lesson {
+      color: #764ba2;
+      font-size: 0.95em;
+      margin-top: 2px;
+      margin-bottom: 0;
+    }
+    .summary {
+      margin-top: 20px;
+      background: #f8f9ff;
+      border-radius: 12px;
+      padding: 18px 18px 12px 18px;
+      border-left: 5px solid #667eea;
+    }
+    .summary-title {
+      color: #764ba2;
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .summary-metric {
+      font-size: 1.1em;
+      margin: 6px 0;
+    }
+    .summary-lessons {
+      margin: 12px 0 0 0;
+    }
+    .lesson-box {
+      background: #e1e8ff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.98em;
+      margin-bottom: 7px;
+      color: #333;
+    }
+    .play-again-btn {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      padding: 12px 0;
+      font-size: 1.1em;
+      font-weight: bold;
+      margin: 20px 0 0 0;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .play-again-btn:hover {
+      background: #764ba2;
+    }
+    .copyright {
+      text-align: center;
+      font-size: 0.97em;
+      color: #667eea;
+      opacity: 0.7;
+      margin-top: 20px;
+      margin-bottom: 0;
+      letter-spacing: 0.03em;
+    }
+    @media (max-width: 600px) {
+      .game-container { padding: 16px 4px; }
+      .header .logo { font-size: 1.3em; }
+      .header .subtitle { font-size: 1em; }
+      .stat-box { font-size: 0.95em; padding: 7px 0 5px 0;}
+      .summary-title { font-size: 1em;}
+      .summary-metric { font-size: 1em;}
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="game"></div>
+  <div class="copyright">© 2025 Use Money Well. All rights reserved.</div>
+  <script>
+    // --- Branding and Config ---
+    const riskProfiles = {
+      conservative: {
+        name: "Conservative",
+        avgReturn: 0.05,
+        volatility: 0.08,
+        desc: "Lower risk, steady growth"
+      },
+      moderate: {
+        name: "Moderate",
+        avgReturn: 0.08,
+        volatility: 0.15,
+        desc: "Balanced risk and reward"
+      },
+      aggressive: {
+        name: "Aggressive",
+        avgReturn: 0.12,
+        volatility: 0.25,
+        desc: "Higher risk, higher potential"
       }
-    });
-    
-    setYearlyGrowth(growth.return);
-    setGameState(prev => ({
-      ...prev,
-      age: newAge,
-      portfolio: growth.newTotal,
-      currentStage: newStage,
-      year: prev.year + 1,
-      totalContributions: prev.totalContributions + growth.contribution,
-      gameComplete: newAge >= 85
-    }));
-    
-    if (newAge >= 85) {
-      setTimeout(() => setGameState(prev => ({ ...prev, showSummary: true })), 1000);
-    }
-  };
+    };
+    const lifeStages = [
+      { name: "Early Career", range: [22, 35] },
+      { name: "Mid Career", range: [36, 50] },
+      { name: "Peak Earning", range: [51, 60] },
+      { name: "Pre-Retirement", range: [61, 65] },
+      { name: "Retirement", range: [66, 85] }
+    ];
+    const lifeEvents = [
+      {
+        age: 28,
+        title: "Getting Married",
+        desc: "Wedding costs $25,000. How do you handle this?",
+        options: [
+          { text: "Withdraw from investments", impact: -25000, lesson: "Early withdrawal reduces compound growth" },
+          { text: "Take a loan, keep investing", impact: -5000, lesson: "Debt has cost, but investments keep growing" },
+          { text: "Simple ceremony, minimal impact", impact: -5000, lesson: "Living within means preserves wealth" }
+        ]
+      },
+      {
+        age: 32,
+        title: "Buying First Home",
+        desc: "Need $50,000 down payment. What's your strategy?",
+        options: [
+          { text: "Liquidate 50% of portfolio", impact: "half_portfolio", lesson: "Large withdrawals hurt long-term growth" },
+          { text: "Withdraw only what's needed", impact: -50000, lesson: "Targeted withdrawals minimize damage" },
+          { text: "Get a loan, keep investments", impact: -10000, lesson: "Leverage can preserve investment growth" }
+        ]
+      },
+      {
+        age: 38,
+        title: "Starting a Family",
+        desc: "Children mean new expenses. How do you adjust?",
+        options: [
+          { text: "Reduce contributions by 50%", impact: "reduce_contrib_50", lesson: "Reduced contributions slow wealth building" },
+          { text: "Switch to conservative investing", impact: "conservative_switch", lesson: "Being too conservative can hurt long-term growth" },
+          { text: "Maintain plan, budget elsewhere", impact: 0, lesson: "Staying disciplined maximizes compound growth" }
+        ]
+      },
+      {
+        age: 45,
+        title: "Job Loss & Career Change",
+        desc: "Unemployment for 8 months. How do you survive?",
+        options: [
+          { text: "Raid retirement savings", impact: -40000, lesson: "Emergency fund would have prevented this loss" },
+          { text: "Live on emergency fund", impact: -15000, lesson: "Emergency funds protect investments" },
+          { text: "Take any job quickly", impact: -5000, lesson: "Quick action minimizes financial damage" }
+        ]
+      },
+      {
+        age: 55,
+        title: "Aging Parents",
+        desc: "Parents need financial support. What do you do?",
+        options: [
+          { text: "Withdraw from retirement fund", impact: -60000, lesson: "This impacts your own retirement security" },
+          { text: "Adjust current budget", impact: -20000, lesson: "Current sacrifices protect future wealth" },
+          { text: "Seek family cost-sharing", impact: -10000, lesson: "Shared responsibility reduces individual burden" }
+        ]
+      }
+    ];
 
-  const handleDecision = (option) => {
-    let newPortfolio = gameState.portfolio;
-    let newRiskLevel = gameState.riskLevel;
-    let newContributions = gameState.totalContributions;
-    
-    if (typeof option.impact === 'number') {
-      newPortfolio += option.impact;
-    } else if (option.impact === 'reduce_contrib_50') {
-      // This would be handled in future calculations
-    } else if (option.impact === 'conservative_switch') {
-      newRiskLevel = 'conservative';
-    } else if (option.isPercentage) {
-      newPortfolio *= (1 + option.impact);
-    }
-    
-    setGameState(prev => ({
-      ...prev,
-      portfolio: Math.max(0, newPortfolio),
-      riskLevel: newRiskLevel,
-      totalContributions: newContributions,
-      lifeEvents: [...prev.lifeEvents, {
-        age: prev.age,
-        event: currentDecision.title,
-        choice: option.text,
-        lesson: option.lesson
-      }]
-    }));
-    
-    setCurrentDecision(null);
-    setTimeout(advanceYear, 500);
-  };
-
-  const changeRiskLevel = (newRisk) => {
-    setGameState(prev => ({ ...prev, riskLevel: newRisk }));
-  };
-
-  const resetGame = () => {
-    setGameState({
+    // --- State ---
+    let state = {
       age: 22,
       portfolio: 10000,
-      riskLevel: 'moderate',
-      currentStage: 'early-career',
+      risk: "moderate",
+      stage: 0,
       year: 2024,
-      totalContributions: 10000,
+      totalContrib: 10000,
       lifeEvents: [],
-      gameComplete: false,
+      gameOver: false,
+      reducedContrib: false,
       showSummary: false
-    });
-    setCurrentDecision(null);
-    setYearlyGrowth(0);
-  };
+    };
 
-  if (currentDecision) {
-    return (
-      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="text-center mb-6">
-            <AlertTriangle className="mx-auto mb-4 text-orange-500" size={48} />
-            <h2 className="text-2xl font-bold text-gray-800">Life Decision at Age {gameState.age}</h2>
-            <h3 className="text-xl text-gray-600 mt-2">{currentDecision.title}</h3>
+    // --- Logic ---
+    function getStage(age) {
+      for (let i = 0; i < lifeStages.length; ++i) {
+        if (age >= lifeStages[i].range[0] && age <= lifeStages[i].range[1]) return i;
+      }
+      return lifeStages.length - 1;
+    }
+    function calcGrowth(portfolio, risk, age, reducedContrib) {
+      const profile = riskProfiles[risk];
+      const rand = (Math.random() - 0.5) * profile.volatility * 2;
+      const marketReturn = profile.avgReturn + rand;
+      let contrib = 6000;
+      if (age >= 36 && age <= 50) contrib = 12000;
+      if (age >= 51 && age <= 60) contrib = 15000;
+      if (age >= 61) contrib = 0;
+      if (reducedContrib) contrib = Math.floor(contrib / 2);
+      const growth = portfolio * marketReturn;
+      return { growth, contrib, marketReturn, newTotal: portfolio + growth + contrib };
+    }
+
+    function render() {
+      const game = document.getElementById('game');
+      if (state.showSummary) {
+        renderSummary(game);
+        return;
+      }
+      // Check for life event
+      const event = lifeEvents.find(e => e.age === state.age);
+      if (event && !state.lifeEvents.some(l => l.age === event.age)) {
+        renderLifeEvent(game, event);
+        return;
+      }
+      // Main game screen
+      game.innerHTML = `
+        <div class="header">
+          <div class="logo">💰 Money Well</div>
+          <div class="subtitle">Lifetime Investment Game</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-label">Age</div>
+            <div class="stat-value">${state.age}</div>
           </div>
-          
-          <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <p className="text-gray-700 text-lg">{currentDecision.description}</p>
+          <div class="stat-box">
+            <div class="stat-label">Portfolio</div>
+            <div class="stat-value" style="color:#2e7d32;">$${Math.round(state.portfolio).toLocaleString()}</div>
           </div>
-          
-          <div className="space-y-4">
-            {currentDecision.options.map((option, index) => (
-              <button
-                key={index}
-                onClick={() => handleDecision(option)}
-                className="w-full p-4 text-left bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
-              >
-                <div className="font-semibold text-gray-800">{option.text}</div>
-                <div className="text-sm text-gray-600 mt-1">{option.lesson}</div>
-              </button>
-            ))}
+          <div class="stat-box">
+            <div class="stat-label">Risk</div>
+            <div class="stat-value">${riskProfiles[state.risk].name}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Year</div>
+            <div class="stat-value">${state.year}</div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (gameState.showSummary) {
-    const finalScore = Math.round(gameState.portfolio);
-    const roi = ((gameState.portfolio - gameState.totalContributions) / gameState.totalContributions * 100).toFixed(1);
-    
-    return (
-      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="text-center mb-8">
-            <Trophy className="mx-auto mb-4 text-yellow-500" size={64} />
-            <h1 className="text-3xl font-bold text-gray-800">Investment Journey Complete!</h1>
-            <div className="text-6xl font-bold text-green-600 my-4">
-              ${finalScore.toLocaleString()}
-            </div>
-            <p className="text-xl text-gray-600">Final Portfolio Value at Age 85</p>
+        <div style="margin-bottom:2px;font-size:0.95em;">
+          <b>Stage:</b> ${lifeStages[state.stage].name}
+        </div>
+        <div class="stage-bar">
+          <div class="stage-fill" style="width:${((state.age-22)/(85-22))*100}%;"></div>
+        </div>
+        <div class="risk-row">
+          <span style="font-size:0.95em;font-weight:500;">Risk Profile:</span>
+          <div class="risk-btns">
+            ${Object.keys(riskProfiles).map(r => `
+              <button class="risk-btn${state.risk===r?' selected':''}" onclick="setRisk('${r}')">${riskProfiles[r].name}</button>
+            `).join('')}
           </div>
-          
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-blue-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Key Metrics</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Total Contributions:</span>
-                  <span className="font-semibold">${gameState.totalContributions.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Investment Growth:</span>
-                  <span className="font-semibold text-green-600">
-                    ${(finalScore - gameState.totalContributions).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Return on Investment:</span>
-                  <span className="font-semibold text-blue-600">{roi}%</span>
-                </div>
+        </div>
+        <div class="desc">${riskProfiles[state.risk].desc}</div>
+        <button class="advance-btn" onclick="advanceYear()" ${state.gameOver?'disabled':''}>
+          Advance to Next Year
+        </button>
+      `;
+    }
+
+    function renderLifeEvent(game, event) {
+      game.innerHTML = `
+        <div class="life-event">
+          <div class="life-event-title">Age ${state.age}: ${event.title}</div>
+          <div class="life-event-desc">${event.desc}</div>
+          ${event.options.map((opt,i) => `
+            <button class="event-choice" onclick="chooseEvent(${event.age},${i})">
+              ${opt.text}
+              <div class="event-lesson">${opt.lesson}</div>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderSummary(game) {
+      const roi = ((state.portfolio - state.totalContrib)/state.totalContrib*100).toFixed(1);
+      let rating = '';
+      if (state.portfolio >= 2000000) rating = '🌟 Excellent!';
+      else if (state.portfolio >= 1000000) rating = '👍 Good!';
+      else if (state.portfolio >= 500000) rating = '📈 Fair';
+      else rating = '📉 Needs Work';
+      game.innerHTML = `
+        <div class="summary">
+          <div class="summary-title">Your Investment Journey Complete!</div>
+          <div class="summary-metric"><b>Final Portfolio:</b> <span style="color:#2e7d32;font-size:1.15em;">$${Math.round(state.portfolio).toLocaleString()}</span></div>
+          <div class="summary-metric"><b>Total Contributions:</b> $${state.totalContrib.toLocaleString()}</div>
+          <div class="summary-metric"><b>Investment Growth:</b> $${Math.round(state.portfolio-state.totalContrib).toLocaleString()}</div>
+          <div class="summary-metric"><b>Return on Investment:</b> <span style="color:#667eea;">${roi}%</span></div>
+          <div class="summary-metric"><b>Performance:</b> <span style="color:#764ba2;">${rating}</span></div>
+          <div class="summary-lessons">
+            <div style="margin:12px 0 6px 0;font-weight:bold;">Life Lessons:</div>
+            ${state.lifeEvents.map(ev => `
+              <div class="lesson-box">
+                <b>Age ${ev.age}: ${ev.event}</b><br>
+                <span style="color:#667eea;">Choice:</span> ${ev.choice}<br>
+                <span style="color:#764ba2;">💡 ${ev.lesson}</span>
               </div>
-            </div>
-            
-            <div className="bg-purple-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Performance Rating</h3>
-              <div className="text-center">
-                {finalScore >= 2000000 && <div className="text-2xl font-bold text-green-600">Excellent! 🌟</div>}
-                {finalScore >= 1000000 && finalScore < 2000000 && <div className="text-2xl font-bold text-blue-600">Good! 👍</div>}
-                {finalScore >= 500000 && finalScore < 1000000 && <div className="text-2xl font-bold text-yellow-600">Fair 📈</div>}
-                {finalScore < 500000 && <div className="text-2xl font-bold text-red-600">Needs Work 📉</div>}
-              </div>
-            </div>
+            `).join('')}
           </div>
-          
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4">Life Lessons Learned</h3>
-            <div className="space-y-3">
-              {gameState.lifeEvents.map((event, index) => (
-                <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                  <div className="font-semibold">Age {event.age}: {event.event}</div>
-                  <div className="text-sm text-gray-600">Choice: {event.choice}</div>
-                  <div className="text-sm text-blue-600 mt-1">💡 {event.lesson}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="bg-yellow-50 p-6 rounded-lg mb-6">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <BookOpen className="mr-2" size={20} />
-              Key Investment Principles
-            </h3>
-            <ul className="space-y-2 text-sm">
-              <li>• <strong>Start Early:</strong> Compound growth is most powerful over long periods</li>
-              <li>• <strong>Stay Consistent:</strong> Regular contributions build wealth steadily</li>
-              <li>• <strong>Manage Risk by Age:</strong> More aggressive when young, conservative near retirement</li>
-              <li>• <strong>Emergency Fund:</strong> Protects investments from unexpected expenses</li>
-              <li>• <strong>Avoid Panic:</strong> Market volatility is normal, stay the course</li>
-              <li>• <strong>Diversification:</strong> Don't put all eggs in one basket</li>
-            </ul>
-          </div>
-          
-          <button
-            onClick={resetGame}
-            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-          >
-            Play Again
-          </button>
+          <div style="margin:14px 0 0 0;font-weight:bold;">Key Principles:</div>
+          <ul style="font-size:0.97em;line-height:1.6;margin:8px 0 0 0;">
+            <li>Start Early: Compound growth is most powerful over long periods</li>
+            <li>Stay Consistent: Regular contributions build wealth steadily</li>
+            <li>Manage Risk by Age: More aggressive when young, conservative near retirement</li>
+            <li>Emergency Fund: Protects investments from unexpected expenses</li>
+            <li>Avoid Panic: Market volatility is normal, stay the course</li>
+            <li>Diversification: Don't put all eggs in one basket</li>
+          </ul>
+          <button class="play-again-btn" onclick="restartGame()">Play Again</button>
         </div>
-      </div>
-    );
-  }
+      `;
+    }
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          <PiggyBank className="text-blue-600 mr-3" size={40} />
-          <h1 className="text-3xl font-bold text-gray-800">Money Well</h1>
-        </div>
-        <p className="text-gray-600">Your Lifetime Investment Journey Simulator</p>
-      </div>
+    // --- Event Handlers ---
+    function setRisk(risk) {
+      state.risk = risk;
+      render();
+    }
+    function advanceYear() {
+      if (state.gameOver) return;
+      const growth = calcGrowth(state.portfolio, state.risk, state.age+1, state.reducedContrib);
+      state.portfolio += growth.growth + growth.contrib;
+      state.totalContrib += growth.contrib;
+      state.age += 1;
+      state.year += 1;
+      state.stage = getStage(state.age);
+      if (state.age >= 85) {
+        state.gameOver = true;
+        setTimeout(() => { state.showSummary = true; render(); }, 700);
+      } else {
+        render();
+      }
+    }
+    function chooseEvent(age, optIdx) {
+      const event = lifeEvents.find(e => e.age === age);
+      const opt = event.options[optIdx];
+      // Apply impact
+      if (typeof opt.impact === "number") {
+        state.portfolio += opt.impact;
+      } else if (opt.impact === "reduce_contrib_50") {
+        state.reducedContrib = true;
+      } else if (opt.impact === "conservative_switch") {
+        state.risk = "conservative";
+      } else if (opt.impact === "half_portfolio") {
+        state.portfolio = state.portfolio / 2;
+      }
+      state.lifeEvents.push({
+        age: age,
+        event: event.title,
+        choice: opt.text,
+        lesson: opt.lesson
+      });
+      render();
+    }
+    function restartGame() {
+      state = {
+        age: 22,
+        portfolio: 10000,
+        risk: "moderate",
+        stage: 0,
+        year: 2024,
+        totalContrib: 10000,
+        lifeEvents: [],
+        gameOver: false,
+        reducedContrib: false,
+        showSummary: false
+      };
+      render();
+    }
 
-      {/* Game Interface */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        {/* Current Status */}
-        <div className="grid md:grid-cols-4 gap-4 mb-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-gray-800">{gameState.age}</div>
-            <div className="text-sm text-gray-600">Age</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
-              ${Math.round(gameState.portfolio).toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-600">Portfolio Value</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-2xl font-bold ${riskProfiles[gameState.riskLevel].color}`}>
-              {riskProfiles[gameState.riskLevel].name}
-            </div>
-            <div className="text-sm text-gray-600">Risk Level</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {gameState.year}
-            </div>
-            <div className="text-sm text-gray-600">Current Year</div>
-          </div>
-        </div>
+    // Expose for inline handlers
+    window.setRisk = setRisk;
+    window.advanceYear = advanceYear;
+    window.chooseEvent = chooseEvent;
+    window.restartGame = restartGame;
 
-        {/* Life Stage Progress */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold">Life Stage</span>
-            <span className="text-sm">{lifeStages[gameState.currentStage].name}</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div 
-              className={`h-3 rounded-full ${lifeStages[gameState.currentStage].color}`}
-              style={{ width: `${((gameState.age - 22) / (85 - 22)) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Risk Level Selection */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3">Adjust Risk Level</h3>
-          <div className="grid grid-cols-3 gap-3">
-            {Object.entries(riskProfiles).map(([key, profile]) => (
-              <button
-                key={key}
-                onClick={() => changeRiskLevel(key)}
-                className={`p-3 rounded-lg border transition-colors ${
-                  gameState.riskLevel === key 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className={`font-semibold ${profile.color}`}>{profile.name}</div>
-                <div className="text-xs text-gray-600 mt-1">{profile.description}</div>
-                <div className="text-xs text-gray-500">
-                  Avg: {(profile.avgReturn * 100).toFixed(1)}% annually
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Growth Indicator */}
-        {yearlyGrowth !== 0 && (
-          <div className={`p-3 rounded-lg mb-4 ${yearlyGrowth > 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-            <div className="flex items-center">
-              <TrendingUp className={yearlyGrowth > 0 ? 'text-green-600' : 'text-red-600'} size={20} />
-              <span className="ml-2">
-                Last year: {yearlyGrowth > 0 ? '+' : ''}{(yearlyGrowth * 100).toFixed(1)}% return
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Controls */}
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={advanceYear}
-            disabled={gameState.gameComplete}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            <DollarSign className="mr-2" size={20} />
-            {gameState.age < 65 ? 'Next Year' : 'Retire & Continue'}
-          </button>
-          <button
-            onClick={resetGame}
-            className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Reset Game
-          </button>
-        </div>
-      </div>
-
-      {/* Instructions */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-lg font-semibold mb-3 flex items-center">
-          <BookOpen className="mr-2" size={20} />
-          How to Play
-        </h3>
-        <div className="text-sm text-gray-700 space-y-2">
-          <p>• <strong>Goal:</strong> Build wealth from age 22 to 85 through smart investing decisions</p>
-          <p>• <strong>Risk Levels:</strong> Conservative (safe, lower returns), Moderate (balanced), Aggressive (higher risk/reward)</p>
-          <p>• <strong>Life Events:</strong> Make crucial financial decisions at major life milestones</p>
-          <p>• <strong>Strategy:</strong> Younger = more aggressive, older = more conservative</p>
-          <p>• <strong>Remember:</strong> Compound growth and consistent contributions are your best friends!</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default MoneyWellGame;
+    // Initial Render
+    render();
+  </script>
+</body>
+</html>
