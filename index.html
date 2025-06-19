@@ -185,684 +185,450 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
 
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4A90E2 100%);
+    min-height: 100vh;
+    padding: 10px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #1e3c72, #4A90E2);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.brand {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.header h1 {
+    font-size: 2.2em;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.header p {
+    font-size: 1.1em;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.4;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 20px;
+    padding: 20px;
+    min-height: 600px;
+}
+
+.controls {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid #e9ecef;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.control-group {
+    margin-bottom: 25px;
+}
+
+.control-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 1rem;
+}
+
+.slider-container {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.slider:focus {
+    outline: 2px solid #4A90E2;
+    outline-offset: 2px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4A90E2;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    background: #357ABD;
+    transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4A90E2;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border: none;
+}
+
+.value-display {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #4A90E2;
+    margin-top: 5px;
+}
+
+.risk-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    border: 2px solid transparent;
+}
+
+.conservative {
+    background: #E3F2FD;
+    color: #1565C0;
+    border-color: #1565C0;
+}
+
+.moderate {
+    background: #FFF3E0;
+    color: #E65100;
+    border-color: #E65100;
+}
+
+.aggressive {
+    background: #FFEBEE;
+    color: #C62828;
+    border-color: #C62828;
+}
+
+.chart-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.results {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.result-card {
+    background: linear-gradient(135deg, #1e3c72, #4A90E2);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-3px);
+}
+
+.result-card h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.result-card .amount {
+    font-size: 1.8em;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.result-card small {
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+.gains-card {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+}
+
+.total-card {
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+}
+
+.wealth-card {
+    background: linear-gradient(135deg, #F39C12, #E67E22);
+}
+
+.education-section {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+    padding: 30px;
+    border-radius: 15px;
+    margin-top: 20px;
+    border-left: 5px solid #4A90E2;
+}
+
+.education-section h2 {
+    color: #1e3c72;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.education-section p {
+    line-height: 1.7;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.tips {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.tip {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+}
+
+.tip h4 {
+    color: #4A90E2;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.tip p {
+    color: #495057;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background: #1e3c72;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.highlight-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+    }
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4A90E2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3c72, #4A90E2);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .brand {
-            font-size: 1.1em;
-            opacity: 0.9;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .header h1 {
-            font-size: 2.8em;
-            margin-bottom: 15px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-        
-        .header p {
-            font-size: 1.3em;
-            opacity: 0.95;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.4;
-            color: #ffffff;
-        }
-        
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            padding: 30px;
-        }
-        
-        .controls {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #e9ecef;
-            height: fit-content;
-        }
-        
-        .control-group {
-            margin-bottom: 30px;
-        }
-        
-        .control-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 1.1em;
-        }
-        
-        .slider-container {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        
-        .slider {
-            width: 100%;
-            height: 12px;
-            border-radius: 6px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-        
-        .slider:focus {
-            outline: 3px solid #4A90E2;
-            outline-offset: 2px;
-        }
-        
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #4A90E2;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-            border: 2px solid #ffffff;
-        }
-        
-        .slider::-webkit-slider-thumb:hover {
-            background: #357ABD;
-            transform: scale(1.1);
-        }
-        
-        .slider::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #4A90E2;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            border: 2px solid #ffffff;
-        }
-        
-        .value-display {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: #4A90E2;
-            margin-top: 5px;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .risk-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.95em;
-            font-weight: 600;
-            border: 2px solid transparent;
-        }
-        
-        .conservative {
-            background: #E3F2FD;
-            color: #1565C0;
-            border-color: #1565C0;
-        }
-        
-        .moderate {
-            background: #FFF3E0;
-            color: #E65100;
-            border-color: #E65100;
-        }
-        
-        .aggressive {
-            background: #FFEBEE;
-            color: #C62828;
-            border-color: #C62828;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 520px;
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border: 1px solid #e9ecef;
-        }
-        
-        .results {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .result-card {
-            background: linear-gradient(135deg, #1e3c72, #4A90E2);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .result-card:hover, .result-card:focus-within {
-            transform: translateY(-5px);
-            border-color: #ffffff;
-        }
-        
-        .result-card h3 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            opacity: 0.9;
-            font-weight: 600;
-        }
-        
-        .result-card .amount {
-            font-size: 2.6em;
-            font-weight: 700;
-            margin-bottom: 5px;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .result-card small {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-        
-        .gains-card {
-            background: linear-gradient(135deg, #27AE60, #2ECC71);
-        }
-        
-        .total-card {
-            background: linear-gradient(135deg, #E74C3C, #C0392B);
-        }
-        
-        .wealth-card {
-            background: linear-gradient(135deg, #F39C12, #E67E22);
-        }
-
-        .education-section {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
-            padding: 35px;
-            border-radius: 15px;
-            margin-top: 30px;
-            border-left: 5px solid #4A90E2;
-            border: 1px solid #d1ecf1;
-        }
-
-        .education-section h2 {
-            color: #1e3c72;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-        }
-
-        .education-section p {
-            line-height: 1.8;
-            color: #2c3e50;
-            margin-bottom: 18px;
-            font-size: 1.1rem;
-        }
-
-        .risk-explanation {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            border: 1px solid #e9ecef;
-        }
-
-        .risk-explanation h3 {
-            color: #1e3c72;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .risk-levels {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .risk-level {
-            padding: 18px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 0.95rem;
-            border: 2px solid;
-            font-weight: 600;
-        }
-
-        .tips {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
-        }
-
-        .tip {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-            border: 1px solid #e9ecef;
-            transition: transform 0.2s ease;
-        }
-
-        .tip:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-
-        .tip h4 {
-            color: #4A90E2;
-            margin-bottom: 12px;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-        }
-
-        .tip p {
-            color: #495057;
-            margin: 0;
-            font-size: 1rem;
-            line-height: 1.7;
-        }
-
-        .generation-impact {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 25px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #4A90E2;
-        }
-
-        .generation-impact h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .generation-impact p {
-            font-size: 1.1rem;
-            color: #ffffff;
-            margin: 0;
-            line-height: 1.7;
-        }
-
-        .instructions {
-            background: #fff3cd;
-            border: 2px solid #ffeaa7;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        .instructions h3 {
-            color: #856404;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .instructions ol {
-            color: #856404;
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 10px;
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 25px;
-            background: #1e3c72;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .footer .brand-footer {
-            font-size: 1.2em;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .footer .copyright {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-top: 10px;
-        }
-
-        /* Screen Reader Only Content */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        /* High Contrast Support */
-        @media (prefers-contrast: high) {
-            .slider:focus {
-                outline: 4px solid #000000;
-            }
-            
-            .result-card {
-                border: 3px solid #ffffff;
-            }
-            
-            .value-display {
-                color: #000000;
-                background: #ffffff;
-                padding: 4px 8px;
-                border-radius: 4px;
-            }
-        }
-
-        /* Reduced Motion Support */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-            
-            .highlight-animation {
-                animation: none;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2.2em;
-            }
-            
-            .chart-container {
-                height: 400px;
-            }
-
-            .tips {
-                grid-template-columns: 1fr;
-            }
-
-            .risk-levels {
-                grid-template-columns: 1fr;
-            }
-
-            .results {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .highlight-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Focus indicators for better keyboard navigation */
-        button:focus, input:focus, .result-card:focus {
-            outline: 3px solid #4A90E2;
-            outline-offset: 2px;
-        }
-
-        /* Skip link for screen readers */
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 6px;
-            background: #4A90E2;
-            color: white;
-            padding: 8px;
-            z-index: 1000;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-
-        .skip-link:focus {
-            top: 6px;
-        }
-    </style>
+    .controls {
+        position: static;
+    }
+    
+    .header h1 {
+        font-size: 1.8em;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .results {
+        grid-template-columns: 1fr;
+    }
+    
+    .tips {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
     <div class="container">
-        <header class="header" role="banner">
+        <header class="header">
             <div class="brand">Use Money Well LLC</div>
             <h1>📈 Investment Compound Growth Calculator</h1>
-            <p>Discover how consistent investing in the stock market can build generational wealth and change your family's financial future forever</p>
+            <p>See how consistent investing builds generational wealth through compound growth</p>
         </header>
         
-        <main id="main-content" class="content" role="main">
-            <section class="controls" aria-label="Investment Calculator Controls">
-                <div class="instructions">
-                    <h3>🎯 How to Use This Investment Calculator</h3>
-                    <ol>
-                        <li>Set your initial investment amount (starting money)</li>
-                        <li>Choose your monthly investment contribution</li>
-                        <li>Select your risk level to see expected returns</li>
-                        <li>Set your investment timeline (longer periods show more powerful compound growth)</li>
-                        <li>Watch how compound interest can transform your wealth over time!</li>
-                    </ol>
-                </div>
-
+        <main class="main-content">
+            <section class="controls">
                 <div class="control-group">
-                    <label for="initialAmount">Initial Investment Amount</label>
+                    <label for="initialAmount">Initial Investment</label>
                     <div class="slider-container">
-                        <input type="range" id="initialAmount" class="slider" min="0" max="50000" value="5000" step="500" 
-                               aria-describedby="initialDisplay" aria-label="Initial investment amount in dollars">
+                        <input type="range" id="initialAmount" class="slider" min="0" max="50000" value="5000" step="500">
                     </div>
-                    <div class="value-display" id="initialDisplay" aria-live="polite">$5,000</div>
+                    <div class="value-display" id="initialDisplay">$5,000</div>
                 </div>
                 
                 <div class="control-group">
-                    <label for="monthlyContribution">Monthly Investment Contribution</label>
+                    <label for="monthlyContribution">Monthly Investment</label>
                     <div class="slider-container">
-                        <input type="range" id="monthlyContribution" class="slider" min="0" max="3000" value="500" step="50"
-                               aria-describedby="monthlyDisplay" aria-label="Monthly investment contribution in dollars">
+                        <input type="range" id="monthlyContribution" class="slider" min="0" max="3000" value="500" step="50">
                     </div>
-                    <div class="value-display" id="monthlyDisplay" aria-live="polite">$500</div>
+                    <div class="value-display" id="monthlyDisplay">$500</div>
                 </div>
                 
                 <div class="control-group">
-                    <label for="interestRate">Expected Annual Return Percentage</label>
+                    <label for="interestRate">Annual Return %</label>
                     <div class="slider-container">
-                        <input type="range" id="interestRate" class="slider" min="3" max="15" value="10" step="0.5"
-                               aria-describedby="rateDisplay riskIndicator" aria-label="Expected annual return percentage">
+                        <input type="range" id="interestRate" class="slider" min="3" max="15" value="10" step="0.5">
                     </div>
-                    <div class="value-display" id="rateDisplay" aria-live="polite">10.0%</div>
-                    <div class="risk-indicator" id="riskIndicator" aria-live="polite">
-                        <span>📊 Moderate Risk - Balanced Portfolio</span>
+                    <div class="value-display" id="rateDisplay">10.0%</div>
+                    <div class="risk-indicator moderate" id="riskIndicator">
+                        <span>📊 Moderate Risk</span>
                     </div>
                 </div>
                 
                 <div class="control-group">
-                    <label for="timeYears">Investment Timeline in Years</label>
+                    <label for="timeYears">Investment Timeline</label>
                     <div class="slider-container">
-                        <input type="range" id="timeYears" class="slider" min="1" max="50" value="25" step="1"
-                               aria-describedby="timeDisplay" aria-label="Investment timeline in years">
+                        <input type="range" id="timeYears" class="slider" min="1" max="50" value="25" step="1">
                     </div>
-                    <div class="value-display" id="timeDisplay" aria-live="polite">25 years</div>
+                    <div class="value-display" id="timeDisplay">25 years</div>
                 </div>
             </section>
             
-            <section class="chart-container" aria-label="Investment Growth Visualization">
-                <canvas id="growthChart" aria-label="Chart showing investment growth over time"></canvas>
-                <div class="sr-only" id="chartDescription" aria-live="polite">
-                    Chart showing how your investment portfolio grows over time compared to total contributions
-                </div>
-            </section>
-            
-            <section class="results" aria-label="Investment Calculation Results">
-                <div class="result-card" tabindex="0" role="region" aria-label="Total invested amount">
-                    <h3>Total Amount Invested</h3>
-                    <div class="amount" id="totalContributions" aria-live="polite">$155,000</div>
-                    <small>Your total money contributed over time</small>
+            <section class="chart-section">
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
                 </div>
                 
-                <div class="result-card gains-card" tabindex="0" role="region" aria-label="Investment gains from compound growth">
-                    <h3>Investment Gains from Compound Growth</h3>
-                    <div class="amount" id="investmentGains" aria-live="polite">$1,200,000</div>
-                    <small>Wealth created by compound interest</small>
-                </div>
-                
-                <div class="result-card total-card" tabindex="0" role="region" aria-label="Total portfolio value">
-                    <h3>Total Portfolio Value</h3>
-                    <div class="amount" id="finalBalance" aria-live="polite">$1,355,000</div>
-                    <small>Your complete investment portfolio worth</small>
-                </div>
-                
-                <div class="result-card wealth-card" tabindex="0" role="region" aria-label="Wealth multiplication factor">
-                    <h3>Wealth Multiplier</h3>
-                    <div class="amount" id="multiplier" aria-live="polite">8.7x</div>
-                    <small>How many times your money multiplied</small>
+                <div class="results">
+                    <div class="result-card">
+                        <h3>Total Invested</h3>
+                        <div class="amount" id="totalContributions">$155,000</div>
+                        <small>Your contributions</small>
+                    </div>
+                    
+                    <div class="result-card gains-card">
+                        <h3>Investment Gains</h3>
+                        <div class="amount" id="investmentGains">$1,200,000</div>
+                        <small>From compound growth</small>
+                    </div>
+                    
+                    <div class="result-card total-card">
+                        <h3>Total Portfolio</h3>
+                        <div class="amount" id="finalBalance">$1,355,000</div>
+                        <small>Complete value</small>
+                    </div>
+                    
+                    <div class="result-card wealth-card">
+                        <h3>Wealth Multiplier</h3>
+                        <div class="amount" id="multiplier">8.7x</div>
+                        <small>Money multiplication</small>
+                    </div>
                 </div>
             </section>
 
             <section class="education-section">
-                <h2>💡 Understanding Investment Returns, Risk & Compound Growth</h2>
-                <p id="explanation">Your investments have the potential to grow significantly through the power of compound returns in the stock market. Understanding the relationship between risk and potential reward is key to building long-term wealth.</p>
-                
-                <article class="risk-explanation">
-                    <h3>📊 Investment Risk Levels & Historical Returns Explained</h3>
-                    <p><strong>The S&P 500 Historical Performance:</strong> The S&P 500 index, which tracks America's 500 largest publicly traded companies, has averaged approximately 10-12% annual returns over the long term (90+ years of data). This includes surviving the Great Depression, multiple recessions, world wars, and major market crashes.</p>
-                    
-                    <div class="risk-levels">
-                        <div class="risk-level conservative">
-                            <strong>Conservative (3-6% Returns)</strong><br>
-                            Government bonds, CDs, Treasury bills, high-yield savings<br>
-                            <em>Lower risk, lower returns, capital preservation focused</em>
-                        </div>
-                        <div class="risk-level moderate">
-                            <strong>Moderate (7-10% Returns)</strong><br>
-                            Balanced portfolios, broad market index funds, diversified ETFs<br>
-                            <em>Balanced risk and growth potential</em>
-                        </div>
-                        <div class="risk-level aggressive">
-                            <strong>Aggressive (10-15% Returns)</strong><br>
-                            Stock market focus, S&P 500 index funds, growth stocks<br>
-                            <em>Higher volatility, higher long-term potential</em>
-                        </div>
-                    </div>
-                    
-                    <p><strong>Why 10-12% Returns Are Historically Realistic:</strong> When you invest in broad market index funds like the S&P 500, you're essentially buying small ownership stakes in America's most successful companies. As these companies grow their profits and expand over decades, your investment value grows with them. This is the foundation of wealth building through equity investing.</p>
-                </article>
-
-                <div class="generation-impact">
-                    <h3>🏛️ Building Generational Wealth Through Compound Growth</h3>
-                    <p>Consistent investing doesn't just change your financial life - it transforms your family's trajectory for generations. The wealth you build today through compound growth becomes the foundation for your children's education, your family's financial security, and opportunities that multiply across generations just like your investments compound over time.</p>
-                </div>
+                <h2>💡 Understanding Compound Growth</h2>
+                <p id="explanation">Your investments grow through compound returns. The earlier you start and the longer you invest, the more powerful this effect becomes.</p>
                 
                 <div class="tips">
-                    <article class="tip">
-                        <h4>⚡ Time is Your Most Powerful Investment Tool</h4>
-                        <p>Starting to invest $500 monthly at age 25 versus age 35 can result in over $500,000 more wealth at retirement due to compound growth. Every year you delay investing costs exponentially more in long-term wealth. The best time to start investing was yesterday, the second best time is today.</p>
-                    </article>
-                    <article class="tip">
-                        <h4>🎯 Consistency Beats Market Timing</h4>
-                        <p>You don't need to time the market or pick individual winning stocks. Consistent monthly investments in broad market index funds (like S&P 500 ETFs) have historically outperformed 90% of professional fund managers over 15+ year periods. Dollar-cost averaging through regular investing smooths out market volatility.</p>
-                    </article>
-                    <article class="tip">
-                        <h4>📈 Market Volatility Creates Opportunity</h4>
-                        <p>Stock markets fluctuate up and down in the short term, but have consistently trended upward over decades. Market crashes and corrections are opportunities to buy quality investments at discounted prices. Stay disciplined and keep investing through market cycles.</p>
-                    </article>
-                    <article class="tip">
-                        <h4>🔄 Automate Your Investment Success</h4>
-                        <p>Set up automatic monthly transfers from your checking account to your investment account. This removes emotion and timing from the equation, ensuring you're consistently investing regardless of market conditions. Automation is key to successful long-term wealth building.</p>
-                    </article>
-                    <article class="tip">
-                        <h4>🏗️ Build Your Financial Foundation First</h4>
-                        <p>Before aggressive investing, establish a 3-6 month emergency fund and maximize any employer 401(k) matching (that's free money). Then focus on tax-advantaged accounts like IRAs and 401(k)s to maximize your compound growth potential while minimizing taxes.</p>
-                    </article>
-                    <article class="tip">
-                        <h4>🎓 Invest in Your Financial Education</h4>
-                        <p>The more you understand about investing and compound growth, the more confident you'll become in your wealth-building journey. Read proven books like "The Simple Path to Wealth" and "The Bogleheads' Guide to Investing." Financial knowledge compounds just like your investments.</p>
-                    </article>
+                    <div class="tip">
+                        <h4>⚡ Time is Power</h4>
+                        <p>Starting early gives compound growth more time to work. Every year you delay costs exponentially more in potential wealth.</p>
+                    </div>
+                    <div class="tip">
+                        <h4>🎯 Consistency Wins</h4>
+                        <p>Regular monthly investing beats trying to time the market. Dollar-cost averaging smooths out volatility.</p>
+                    </div>
+                    <div class="tip">
+                        <h4>📈 Historical Context</h4>
+                        <p>The S&P 500 has averaged 10-12% returns over 90+ years, surviving crashes, wars, and recessions.</p>
+                    </div>
+                    <div class="tip">
+                        <h4>🔄 Automate Success</h4>
+                        <p>Set up automatic transfers to remove emotion from investing. Consistency is key to wealth building.</p>
+                    </div>
                 </div>
             </section>
         </main>
 
-        <footer class="footer" role="contentinfo">
-            <div class="brand-footer">Use Money Well LLC</div>
-            <div>Mastering money one decision at a time.</div>
-            <div class="copyright">© 2025 Use Money Well LLC. All rights reserved.</div>
+        <footer class="footer">
+            <div>© 2025 Use Money Well LLC. Building wealth through smart money decisions.</div>
         </footer>
     </div>
 
     <script>
         let chart;
         
-        // Initialize chart with accessibility features
         function initChart() {
             const ctx = document.getElementById('growthChart').getContext('2d');
             chart = new Chart(ctx, {
@@ -870,20 +636,20 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Total Amount Invested',
+                        label: 'Total Invested',
                         data: [],
-                        borderColor: '#4A90E2',  // Using the consistent blue
+                        borderColor: '#4A90E2',
                         backgroundColor: 'rgba(74, 144, 226, 0.1)',
                         fill: true,
-                        tension: 0.3,
+                        tension: 0.4,
                         borderWidth: 3
                     }, {
-                        label: 'Portfolio Value with Compound Growth',
+                        label: 'Portfolio Value',
                         data: [],
                         borderColor: '#27AE60',
                         backgroundColor: 'rgba(39, 174, 96, 0.1)',
                         fill: false,
-                        tension: 0.3,
+                        tension: 0.4,
                         borderWidth: 4
                     }]
                 },
@@ -893,24 +659,15 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Investment Compound Growth Over Time',
+                            text: 'Investment Growth Over Time',
                             font: {
-                                size: 20,
-                                weight: 'bold',
-                                family: 'Inter'
+                                size: 16,
+                                weight: 'bold'
                             }
                         },
                         legend: {
                             display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14,
-                                    family: 'Inter'
-                                },
-                                usePointStyle: true,
-                                padding: 20
-                            }
+                            position: 'top'
                         }
                     },
                     scales: {
@@ -918,81 +675,54 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return ' + (value >= 1000000 ? (value/1000000).toFixed(1) + 'M' : value.toLocaleString());
-                                },
-                                font: {
-                                    family: 'Inter'
+                                    if (value >= 1000000) {
+                                        return '$' + (value/1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return '$' + (value/1000).toFixed(0) + 'K';
+                                    } else {
+                                        return '$' + value.toLocaleString();
+                                    }
                                 }
                             },
                             title: {
                                 display: true,
-                                text: 'Portfolio Value ($)',
-                                font: {
-                                    size: 14,
-                                    family: 'Inter'
-                                }
+                                text: 'Value ($)'
                             }
                         },
                         x: {
                             title: {
                                 display: true,
-                                text: 'Years',
-                                font: {
-                                    size: 14,
-                                    family: 'Inter'
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter'
-                                }
+                                text: 'Years'
                             }
                         }
                     },
                     interaction: {
                         intersect: false,
                         mode: 'index'
-                    },
-                    // Accessibility features
-                    onHover: function(event, elements) {
-                        if (elements.length > 0) {
-                            const dataIndex = elements[0].index;
-                            const year = chart.data.labels[dataIndex];
-                            const contributions = chart.data.datasets[0].data[dataIndex];
-                            const portfolio = chart.data.datasets[1].data[dataIndex];
-                            
-                            // Update screen reader description
-                            const description = `Year ${year}: Total invested ${contributions.toLocaleString()}, Portfolio value ${portfolio.toLocaleString()}`;
-                            document.getElementById('chartDescription').textContent = description;
-                        }
                     }
                 }
             });
         }
         
-        // Update risk indicator with enhanced accessibility
         function updateRiskIndicator(rate) {
             const indicator = document.getElementById('riskIndicator');
-            const riskSpan = indicator.querySelector('span');
+            const span = indicator.querySelector('span');
             
+            // Remove all risk classes
             indicator.className = 'risk-indicator';
             
             if (rate <= 6) {
                 indicator.classList.add('conservative');
-                riskSpan.textContent = '🛡️ Conservative Risk - Bonds & Safe Investments';
-                indicator.setAttribute('aria-label', 'Conservative risk level selected. Expected returns 3 to 6 percent annually.');
+                span.textContent = '🛡️ Conservative Risk';
             } else if (rate <= 10) {
                 indicator.classList.add('moderate');
-                riskSpan.textContent = '📊 Moderate Risk - Balanced Portfolio & Index Funds';
-                indicator.setAttribute('aria-label', 'Moderate risk level selected. Expected returns 7 to 10 percent annually.');
+                span.textContent = '📊 Moderate Risk';
             } else {
                 indicator.classList.add('aggressive');
-                riskSpan.textContent = '🚀 Aggressive Risk - Stock Market & S&P 500 Focus';
-                indicator.setAttribute('aria-label', 'Aggressive risk level selected. Expected returns 10 to 15 percent annually.');
+                span.textContent = '🚀 Aggressive Risk';
             }
         }
         
-        // Calculate compound growth with enhanced precision
         function calculateGrowth() {
             const initial = parseFloat(document.getElementById('initialAmount').value);
             const monthly = parseFloat(document.getElementById('monthlyContribution').value);
@@ -1006,14 +736,14 @@
             let balance = initial;
             let totalContributions = initial;
             
-            // Add initial values
+            // Year 0
             labels.push('0');
-            contributionsData.push(Math.round(totalContributions));
-            balanceData.push(Math.round(balance));
+            contributionsData.push(totalContributions);
+            balanceData.push(balance);
             
-            // Calculate year by year with monthly compounding
+            // Calculate year by year
             for (let year = 1; year <= years; year++) {
-                // Add monthly contributions throughout the year with compound growth
+                // Monthly compounding
                 for (let month = 1; month <= 12; month++) {
                     balance = balance * (1 + rate/12) + monthly;
                     totalContributions += monthly;
@@ -1024,25 +754,25 @@
                 balanceData.push(Math.round(balance));
             }
             
-            // Update chart
+            // Update chart data and re-render
             chart.data.labels = labels;
             chart.data.datasets[0].data = contributionsData;
             chart.data.datasets[1].data = balanceData;
-            chart.update('none');
+            chart.update('active');
             
-            // Update result cards with enhanced formatting
+            // Update result cards
             const finalBalance = Math.round(balance);
-            const investmentGains = finalBalance - totalContributions;
+            const investmentGains = finalBalance - Math.round(totalContributions);
             const multiplier = (finalBalance / totalContributions).toFixed(1);
             
-            // Format large numbers consistently
+            // Format currency
             const formatCurrency = (amount) => {
                 if (amount >= 1000000) {
-                    return ' + (amount / 1000000).toFixed(1) + 'M';
+                    return '$' + (amount / 1000000).toFixed(1) + 'M';
                 } else if (amount >= 1000) {
-                    return ' + (amount / 1000).toFixed(0) + 'K';
+                    return '$' + (amount / 1000).toFixed(0) + 'K';
                 } else {
-                    return ' + amount.toLocaleString();
+                    return '$' + amount.toLocaleString();
                 }
             };
             
@@ -1051,52 +781,32 @@
             document.getElementById('finalBalance').textContent = formatCurrency(finalBalance);
             document.getElementById('multiplier').textContent = multiplier + 'x';
             
-            // Update explanation with specific results and enhanced SEO content
-            const gainPercentage = ((investmentGains / totalContributions) * 100).toFixed(0);
-            const monthlyRate = (rate * 100).toFixed(1);
-            
-            let riskLevel = 'moderate';
-            let riskDescription = 'balanced portfolio with index funds';
-            if (rate <= 0.06) {
-                riskLevel = 'conservative';
-                riskDescription = 'conservative strategy with bonds and safe investments';
-            } else if (rate > 0.10) {
-                riskLevel = 'aggressive';
-                riskDescription = 'aggressive stock market strategy focusing on S&P 500 index funds';
-            }
-            
-            const explanation = `With a ${riskLevel} investment strategy using ${riskDescription} and averaging ${monthlyRate}% annual returns over ${years} years, your ${formatCurrency(totalContributions)} in total contributions could grow to ${formatCurrency(finalBalance)} through compound growth. That's ${formatCurrency(investmentGains)} in investment gains - a ${gainPercentage}% increase from the power of compound interest! Your money multiplied ${multiplier} times, demonstrating how consistent investing in diversified stock market funds can build generational wealth over time.`;
-            
+            // Update explanation
+            const explanation = `Over ${years} years, investing $${monthly.toLocaleString()} monthly with a ${(rate * 100).toFixed(1)}% annual return, your ${formatCurrency(totalContributions)} in contributions could grow to ${formatCurrency(finalBalance)}. That's ${formatCurrency(investmentGains)} in gains from compound growth - your money multiplied ${multiplier} times!`;
             document.getElementById('explanation').textContent = explanation;
             
-            // Add highlight animation to significant gains
+            // Add highlight animation for significant gains
             const gainsCard = document.querySelector('.gains-card');
             if (investmentGains > totalContributions) {
                 gainsCard.classList.add('highlight-animation');
-                setTimeout(() => gainsCard.classList.remove('highlight-animation'), 4000);
+                setTimeout(() => gainsCard.classList.remove('highlight-animation'), 3000);
             }
-            
-            // Update chart accessibility description
-            const chartDesc = `Investment growth chart showing ${years} year projection. Starting with ${formatCurrency(initial)} and adding ${formatCurrency(monthly)} monthly, your portfolio could grow from ${formatCurrency(totalContributions)} invested to ${formatCurrency(finalBalance)} total value.`;
-            document.getElementById('chartDescription').textContent = chartDesc;
         }
         
-        // Update display values with enhanced formatting
         function updateDisplays() {
-            const initial = document.getElementById('initialAmount').value;
-            const monthly = document.getElementById('monthlyContribution').value;
-            const rate = document.getElementById('interestRate').value;
-            const years = document.getElementById('timeYears').value;
+            const initial = parseFloat(document.getElementById('initialAmount').value);
+            const monthly = parseFloat(document.getElementById('monthlyContribution').value);
+            const rate = parseFloat(document.getElementById('interestRate').value);
+            const years = parseInt(document.getElementById('timeYears').value);
             
-            document.getElementById('initialDisplay').textContent = ' + parseInt(initial).toLocaleString();
-            document.getElementById('monthlyDisplay').textContent = ' + parseInt(monthly).toLocaleString();
-            document.getElementById('rateDisplay').textContent = parseFloat(rate).toFixed(1) + '%';
-            document.getElementById('timeDisplay').textContent = years + (years == 1 ? ' year' : ' years');
+            document.getElementById('initialDisplay').textContent = '$' + initial.toLocaleString();
+            document.getElementById('monthlyDisplay').textContent = '$' + monthly.toLocaleString();
+            document.getElementById('rateDisplay').textContent = rate.toFixed(1) + '%';
+            document.getElementById('timeDisplay').textContent = years + (years === 1 ? ' year' : ' years');
             
-            updateRiskIndicator(parseFloat(rate));
+            updateRiskIndicator(rate);
         }
         
-        // Enhanced event listeners with accessibility support
         function addEventListeners() {
             const sliders = ['initialAmount', 'monthlyContribution', 'interestRate', 'timeYears'];
             
@@ -1107,43 +817,15 @@
                     updateDisplays();
                     calculateGrowth();
                 });
-                
-                // Add keyboard support
-                slider.addEventListener('keydown', (e) => {
-                    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
-                        e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                        setTimeout(() => {
-                            updateDisplays();
-                            calculateGrowth();
-                        }, 100);
-                    }
-                });
             });
         }
         
-        // Initialize everything when page loads
+        // Initialize when page loads
         window.addEventListener('load', () => {
             initChart();
             updateDisplays();
             calculateGrowth();
             addEventListeners();
-            
-            // Add focus management for better accessibility
-            const firstSlider = document.getElementById('initialAmount');
-            if (firstSlider) {
-                firstSlider.setAttribute('tabindex', '0');
-            }
-        });
-        
-        // Enhanced error handling
-        window.addEventListener('error', (e) => {
-            console.error('Investment calculator error:', e);
-            // Provide fallback message to users
-            const errorMsg = document.createElement('div');
-            errorMsg.className = 'error-message';
-            errorMsg.style.cssText = 'background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin: 20px; text-align: center;';
-            errorMsg.textContent = 'Calculator temporarily unavailable. Please refresh the page.';
-            document.querySelector('.content').prepend(errorMsg);
         });
     </script>
 </body>
