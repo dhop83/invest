@@ -841,27 +841,109 @@
         }
         
         // Update risk indicator with enhanced accessibility
-        function updateRiskIndicator(rate) {
-            const indicator = document.getElementById('riskIndicator');
-            const riskSpan = indicator.querySelector('span');
-            
-            indicator.className = 'risk-indicator';
-            
-            if (rate <= 6) {
-                indicator.classList.add('conservative');
-                riskSpan.textContent = '🛡️ Conservative Risk - Bonds & Safe Investments';
-                indicator.setAttribute('aria-label', 'Conservative risk level selected. Expected returns 3 to 6 percent annually.');
-            } else if (rate <= 10) {
-                indicator.classList.add('moderate');
-                riskSpan.textContent = '📊 Moderate Risk - Balanced Portfolio & Index Funds';
-                indicator.setAttribute('aria-label', 'Moderate risk level selected. Expected returns 7 to 10 percent annually.');
-            } else {
-                indicator.classList.add('aggressive');
-                riskSpan.textContent = '🚀 Aggressive Risk - Stock Market & S&P 500 Focus';
-                indicator.setAttribute('aria-label', 'Aggressive risk level selected. Expected returns 10 to 15 percent annually.');
-            }
-        }
-        
+function updateRiskIndicator(rate) {
+    const indicator = document.getElementById('riskIndicator');
+    const riskSpan = indicator.querySelector('span');
+    
+    indicator.className = 'risk-indicator';
+    
+    if (rate <= 6) {
+        indicator.classList.add('conservative');
+        riskSpan.textContent = '🟢 Conservative Risk - Safe Investments';
+    } else if (rate <= 10) {
+        indicator.classList.add('moderate');
+        riskSpan.textContent = '🟡 Moderate Risk - Balanced Portfolio';
+    } else {
+        indicator.classList.add('aggressive');
+        riskSpan.textContent = '🔴 Aggressive Risk - High Growth Focus';
+    }
+}
+        // Calculate compound interest
+function calculateCompoundInterest(principal, monthlyContribution, rate, years) {
+    const monthlyRate = rate / 100 / 12;
+    const totalMonths = years * 12;
+    
+    // Future value of initial investment
+    const futureValueInitial = principal * Math.pow(1 + monthlyRate, totalMonths);
+    
+    // Future value of monthly contributions (annuity)
+    const futureValueMonthly = monthlyRate > 0 ? 
+        monthlyContribution * (Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate : 
+        monthlyContribution * totalMonths;
+    
+    const totalValue = futureValueInitial + futureValueMonthly;
+    const totalContributions = principal + (monthlyContribution * totalMonths);
+    const totalGains = totalValue - totalContributions;
+    
+    return {
+        totalValue: totalValue,
+        totalContributions: totalContributions,
+        totalGains: totalGains,
+        multiplier: totalContributions > 0 ? totalValue / totalContributions : 0
+    };
+}
+
+// Update all calculations and display
+function updateCalculations() {
+    const initial = parseFloat(document.getElementById('initialAmount').value);
+    const monthly = parseFloat(document.getElementById('monthlyContribution').value);
+    const rate = parseFloat(document.getElementById('interestRate').value);
+    const years = parseInt(document.getElementById('timeYears').value);
+    
+    // Update display values
+    document.getElementById('initialDisplay').textContent = '$' + initial.toLocaleString();
+    document.getElementById('monthlyDisplay').textContent = '$' + monthly.toLocaleString();
+    document.getElementById('rateDisplay').textContent = rate.toFixed(1) + '%';
+    document.getElementById('timeDisplay').textContent = years + ' years';
+    
+    // Update risk indicator
+    updateRiskIndicator(rate);
+    
+    // Calculate results
+    const results = calculateCompoundInterest(initial, monthly, rate, years);
+    
+    // Update result cards
+    document.getElementById('totalContributions').textContent = '$' + Math.round(results.totalContributions).toLocaleString();
+    document.getElementById('investmentGains').textContent = '$' + Math.round(results.totalGains).toLocaleString();
+    document.getElementById('finalBalance').textContent = '$' + Math.round(results.totalValue).toLocaleString();
+    document.getElementById('multiplier').textContent = results.multiplier.toFixed(1) + 'x';
+    
+    // Update chart
+    updateChart(initial, monthly, rate, years);
+}
+
+// Update chart data
+function updateChart(initial, monthly, rate, years) {
+    const labels = [];
+    const contributionsData = [];
+    const portfolioData = [];
+    
+    for (let year = 0; year <= years; year++) {
+        labels.push(year);
+        const results = calculateCompoundInterest(initial, monthly, rate, year);
+        contributionsData.push(results.totalContributions);
+        portfolioData.push(results.totalValue);
+    }
+    
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = contributionsData;
+    chart.data.datasets[1].data = portfolioData;
+    chart.update();
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initChart();
+    
+    // Add event listeners to all sliders
+    const sliders = ['initialAmount', 'monthlyContribution', 'interestRate', 'timeYears'];
+    sliders.forEach(id => {
+        document.getElementById(id).addEventListener('input', updateCalculations);
+    });
+    
+    // Initial calculation
+    updateCalculations();
+});
         // Calculate compound growth with enhanced precision
         function calculateGrowth() {
             const initial = parseFloat(document.getElementById('initialAmount').value);
@@ -999,7 +1081,7 @@
             addEventListeners();
             
             // Add focus management for better accessibility
-            const firstSlider = document.getElementById('initialAmount');
+            const firstSlider = document.getEcdlementById('initialAmount');
             if (firstSlider) {
                 firstSlider.setAttribute('tabindex', '0');
             }
